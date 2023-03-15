@@ -1,4 +1,4 @@
-resource "azurerm_availability_set" "aset" {
+resource "azurerm_availability_set" "aset" { # create an availability set for the VM
   name                         = "n01510487-windows-aset"
   location                     = var.location
   resource_group_name          = var.resource_group_name
@@ -7,7 +7,7 @@ resource "azurerm_availability_set" "aset" {
   tags                         = var.tags
 }
 
-resource "azurerm_network_interface" "nic" {
+resource "azurerm_network_interface" "nic" { # create a network interface for the VM
   name                = "n01510487-windows-vm-nic"
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -20,7 +20,7 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
-resource "azurerm_public_ip" "pip" {
+resource "azurerm_public_ip" "pip" { # create a public IP address for the VM
   name                = "n01510487-windows-vm-pip"
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -29,7 +29,7 @@ resource "azurerm_public_ip" "pip" {
   tags                = var.tags
 }
 
-resource "azurerm_windows_virtual_machine" "vm" {
+resource "azurerm_windows_virtual_machine" "vm" { # create a Windows VM
   name                  = "n01510487-wvm"
   location              = var.location
   resource_group_name   = var.resource_group_name
@@ -41,26 +41,26 @@ resource "azurerm_windows_virtual_machine" "vm" {
 
   availability_set_id = azurerm_availability_set.aset.id
 
-  source_image_reference {
+  source_image_reference { # use the latest Windows Server 2016 image
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
     sku       = "2016-Datacenter"
     version   = "latest"
   }
 
-  os_disk {
+  os_disk { # create a data disk for the VM
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
-  boot_diagnostics {
+  boot_diagnostics { # enable boot diagnostics to store VM boot logs
     storage_account_uri = var.boot_diagnostics_storage_account_uri
   }
 
   tags = var.tags
 }
 
-resource "azurerm_virtual_machine_extension" "antimalware" {
+resource "azurerm_virtual_machine_extension" "antimalware" { # create an extension to enable antimalware for security
   name                 = "n01510487-windows-vm-antimalware"
   virtual_machine_id   = azurerm_windows_virtual_machine.vm.id
   publisher            = "Microsoft.Azure.Security"

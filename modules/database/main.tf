@@ -1,4 +1,4 @@
-resource "azurerm_postgresql_server" "postgres" {
+resource "azurerm_postgresql_server" "postgres" { # create a PostgreSQL server
   name                = "n01510487-postgresql"
   location            = var.location
   resource_group_name = var.resource_group_name

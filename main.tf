@@ -36,6 +36,8 @@ module "common" {
 }
 
 module "vmlinux" {
+  depends_on = [module.common]
+
   source                               = "./modules/vmlinux"
   resource_group_name                  = module.rgroup.resource_group_name
   location                             = "canadacentral"
@@ -46,6 +48,8 @@ module "vmlinux" {
 }
 
 module "vmwindows" {
+  depends_on = [module.common] # added this because I was getting an error about blob storage
+
   source                               = "./modules/vmwindows"
   resource_group_name                  = module.rgroup.resource_group_name
   location                             = "canadacentral"

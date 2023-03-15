@@ -2,13 +2,13 @@ locals {
   vm_names = ["n01510487-vm1", "n01510487-vm2"]
 }
 
-resource "azurerm_network_interface" "nic" {
+resource "azurerm_network_interface" "nic" { # create a network interface for each VM 
   count               = 2
   name                = "${local.vm_names[count.index]}-nic"
   location            = var.location
   resource_group_name = var.resource_group_name
 
-  ip_configuration {
+  ip_configuration { # associate the public IP address with the network interface
     name                          = "primary"
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Dynamic"
@@ -17,7 +17,7 @@ resource "azurerm_network_interface" "nic" {
   tags = var.tags
 }
 
-resource "azurerm_availability_set" "aset" {
+resource "azurerm_availability_set" "aset" { # create an availability set for the VMs
   name                         = "n01510487-aset"
   location                     = var.location
   resource_group_name          = var.resource_group_name
@@ -26,17 +26,17 @@ resource "azurerm_availability_set" "aset" {
   tags                         = var.tags
 }
 
-resource "azurerm_public_ip" "pip" {
+resource "azurerm_public_ip" "pip" { # create a public IP address for each VM
   count               = 2
   name                = "${local.vm_names[count.index]}-pip"
   location            = var.location
   resource_group_name = var.resource_group_name
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
   domain_name_label   = "canol-${local.vm_names[count.index]}"
   tags                = var.tags
 }
 
-resource "azurerm_linux_virtual_machine" "vm" {
+resource "azurerm_linux_virtual_machine" "vm" { # create a Linux VM for each network interface
   count                 = 2
   name                  = local.vm_names[count.index]
   admin_username        = "admin0487"
@@ -48,25 +48,25 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
   disable_password_authentication = true
 
-  admin_ssh_key {
+  admin_ssh_key { # add the public key to the VM
     username   = var.admin_username
     public_key = file("/Users/canoltasgin/.ssh/id_rsa.pub")
   }
 
 
-  source_image_reference {
+  source_image_reference { # use the latest CentOS 8 image
     publisher = "OpenLogic"
     offer     = "CentOS"
     sku       = "8_2"
     version   = "latest"
   }
 
-  os_disk {
+  os_disk { # create a data disk for the VM
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
 
-  boot_diagnostics {
+  boot_diagnostics { # enable boot diagnostics to store VM boot logs
     storage_account_uri = var.boot_diagnostics_storage_account_uri
   }
 
